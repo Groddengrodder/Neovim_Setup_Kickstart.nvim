@@ -231,6 +231,10 @@ require('lazy').setup({
             -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
             -- and elegantly composed help section, `:help lsp-vs-treesitter`
 
+            vim.diagnostic.config {
+                virtual_text = true,
+            }
+
             --  This function gets run when an LSP attaches to a particular buffer.
             --    That is to say, every time a new file is opened that is associated with
             --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -346,7 +350,11 @@ require('lazy').setup({
             --  - settings (table): Override the default settings passed when initializing the server.
             --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
             local servers = {
-                clangd = {},
+                clangd = {
+                    init_options = {
+                        fallbackFlags = { '--std=c++23' },
+                    },
+                },
                 -- gopls = {},
                 -- pyright = {},
                 -- rust_analyzer = {},
@@ -570,6 +578,31 @@ require('lazy').setup({
 
     { 'ThePrimeagen/harpoon', branch = 'harpoon2', dependencies = { 'nvim-lua/plenary.nvim' } },
 
+    {
+        'lervag/vimtex',
+        lazy = false, -- we don't want to lazy load VimTeX
+        -- tag = "v2.15", -- uncomment to pin to a specific release
+        init = function()
+            -- VimTeX configuration goes here, e.g.
+            vim.g.vimtex_view_method = 'general'
+        end,
+    },
+
+    {
+        'benlubas/molten-nvim',
+        version = '^1.0.0', -- use version <2.0.0 to avoid breaking changes
+        build = ':UpdateRemotePlugins',
+        init = function()
+            -- this is an example, not a default. Please see the readme for more configuration options
+            vim.g.molten_output_win_max_height = 12
+        end,
+    },
+
+    {
+        'willothy/wezterm.nvim',
+        config = true,
+    },
+
     -- Highlight todo, notes, etc in comments
     { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -614,8 +647,9 @@ require('lazy').setup({
         'nvim-treesitter/nvim-treesitter',
         build = ':TSUpdate',
         opts = {
-            ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+            ensure_installed = { 'cpp', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'query', 'vim', 'vimdoc' },
             -- Autoinstall languages that are not installed
+            ignore_install = { 'latex' },
             auto_install = true,
             highlight = {
                 enable = true,
@@ -623,6 +657,7 @@ require('lazy').setup({
                 --  If you are experiencing weird indenting issues, add the language to
                 --  the list of additional_vim_regex_highlighting and disabled languages for indent.
                 additional_vim_regex_highlighting = { 'ruby' },
+                disable = { 'latex' },
             },
             indent = { enable = true, disable = { 'ruby' } },
         },
